@@ -81,6 +81,8 @@
 #include "WProgram.h"
 #endif
 
+#include <SoftwareSerial.h>
+
 #define BUFFER_SIZE 30
 
 // HerkuleX LED - See. Manual p48.
@@ -126,6 +128,8 @@ public:
   byte getStatus(uint8_t id);
 
 private:
+  SoftwareSerial *SoftSerial;
+  
   void send(byte* buf, uint8_t size);
   void receive(uint8_t size);
 

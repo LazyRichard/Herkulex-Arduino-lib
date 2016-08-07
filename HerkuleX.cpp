@@ -18,7 +18,6 @@
 */
 
 #include "HerkuleX.h"
-#include "SoftwareSerial.h"
 
 // HerekuleX Command - See. Manual p40.
 #define DR_SERVO_CMD_ROM_WRITE   0x01
@@ -31,7 +30,6 @@
 #define DR_SERVO_CMD_ROLLBACK	 0x08
 #define DR_SERVO_CMD_REBOOT	 	 0x09
 
-extern SoftwareSerial SoftSerial(0, 1);
 CHerkuleX HerkuleX;
 
 enum {
@@ -55,9 +53,9 @@ enum {
  */
 void CHerkuleX::begin(long baudrate, uint8_t rx, uint8_t tx)
 {
-	SoftSerial.setRX(rx);
-	SoftSerial.setTX(tx);
-	SoftSerial.begin(baudrate);
+	SoftSerial = new SoftwareSerial(rx, tx);
+	
+	SoftSerial->begin(baudrate);
 	comm_type = SOFTWARE_SERIAL;
 }
 
@@ -120,7 +118,7 @@ void CHerkuleX::send(byte* buf, uint8_t size)
 	switch (comm_type)
 	{
 	case SOFTWARE_SERIAL:
-		SoftSerial.write(buf, size);
+		SoftSerial->write(buf, size);
 		break;
 	case HARDWARE_SERIAL:
 		Serial.write(buf, size);
@@ -155,13 +153,13 @@ void CHerkuleX::receive(uint8_t size)
 	switch (comm_type)
 	{
 	case SOFTWARE_SERIAL:
-		while (SoftSerial.available()) {
-			byte inchar = (byte)SoftSerial.read();
+		while (SoftSerial->available()) {
+			byte inchar = (byte)SoftSerial->read();
 			if (i < size) recv_buf[i] = inchar;
 			//delay(1);
 			i++;
 		}
-		SoftSerial.flush();
+		//SoftSerial->flush();
 		break;
 	case HARDWARE_SERIAL:
 		while (Serial.available()) {
